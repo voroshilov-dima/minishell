@@ -2,37 +2,90 @@
 
 
 
+char	**get_path(t_dictionary *environment)
+{
+	char *path_string;
+	char **path;
 
-// char	*find_program_path(char *program)
-// {
-// 	int	i;
+	path_string = NULL;
+	while (environment)
+	{
+		if (ft_strcmp(environment->key, "PATH") == 0) // should be case senitive?
+			path_string = environment->value;
+		environment = environment->next;
+	}
+	if (!path_string)
+		return (NULL);
+	path = ft_strsplit(path_string, ':');
+	return (path);
+}
 
-// 	i = 0;
-// 	while (ft_strncmp(PA)
-// }
+char    *get_full_path(char *dir, char *file)
+{
+    char *dir_with_slash;
+    char *file_path;
 
-int launch(char **args)
+    if (dir == NULL)
+        return (ft_strdup(file));
+    if (dir[ft_strlen(dir) - 1] == '/')
+        dir_with_slash = ft_strdup(dir);
+    else
+        dir_with_slash = ft_strjoin(dir, "/");
+    file_path = ft_strjoin(dir_with_slash, file);
+    free(dir_with_slash);
+    return (file_path);
+}
+
+char	*find_program_path(char *name, t_dictionary *environment)
+{
+	char			**path;
+	struct dirent	*dirent;
+	DIR				*dir;
+	int				i;
+
+	i = 0;
+	path = get_path(environment); // clear memory allocated
+	while (path[i])
+	{
+		dir = opendir(path[i]);
+		while ((dirent = readdir(dir)) != NULL)
+		{
+			if (ft_strcmp(dirent->d_name, name) == 0)
+				return (get_full_path(path[i], dirent->d_name));
+		}
+		i++;
+	}
+	return (NULL);
+}
+
+int launch(char **args, t_dictionary *environment)
 {
 	(void)args;	
 
-	/*
 	pid_t	pid, wpid;
 	int		status;
+	char	*program;
 
 	pid = fork();
 	if (pid == 0)
 	{
     	// Child process
-    	if (execve(args[0], args, environ) == -1)
+		program = find_program_path(args[0], environment);
+		if (!program)
 		{
-      		perror("sh");
+			printf("%s: command not found\n", args[0]);
+			exit(EXIT_FAILURE);
+		}
+    	if (!program || execve(program, args, environ) == -1)
+		{
+      		exit(EXIT_FAILURE);
     	}
-    	exit(EXIT_FAILURE);
+    	
   	}
 	else if (pid < 0)
 	{
     	// Error forking
-    	perror("lsh");
+    	perror("minishell");
   	}
 	else
 	{
@@ -41,16 +94,16 @@ int launch(char **args)
 		wpid = waitpid(pid, &status, WUNTRACED);
 		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
   }
-  */
 
   return 1;
 }
 
-int		execute(char **args)
+int		execute(char **args, t_dictionary *environment)
 {
 	static t_builtin builtins[] = {
-		{"cd", cd},
-		{"env", env},
+		{"cd", ms_cd},
+		{"env", ms_env},
+		{"exit", ms_exit},
 		{"null", NULL}
 	};
 
@@ -62,84 +115,85 @@ int		execute(char **args)
 	while (builtins[i].func != NULL)
 	{
 		if (ft_strcmp(builtins[i].name, args[0]) == 0)
-      		return (builtins[i].func(args));
+      		return (builtins[i].func(args, environment));
 		i++;
 	}
-	return launch(args);
+	return launch(args, environment);
 }
 
-void	minishell_loop(void)
+void	minishell_loop(t_dictionary *environment)
 {
 	char	*line;
   	char	**args;
-  	int		status;
 
-	status = 1;
-	while (status)
+	while (TRUE)
 	{
 		printf("$> ");
 		line = readline();
     	args = ft_strsplit(line, ' ');
-    	status = execute(args);
+    	execute(args, environment);
 	}
 }
 
-// while (environ[i] != 0)
-// 	{
-// 		printf("%s\n", environ[i]);
-// 		i++;
-// 	}
-
-char	*get_key(char *str)
+t_dictionary *string_to_dictionary(char *str)
 {
-	int	i;
-
-	i = 0;
-	while (str && *str != '=')
-		
-
-}
-
-char	*get_value(char *str)
-{
-
-}
-
-t_dictionary *parse_environ(void)
-{
-	t_dictionary *env;
-	int i;
-	char *key;
-	char *value;
+	t_dictionary	*dict;
+	int				len;
+	int				equal_sign_pos;
 	
-	i = 0;
-	if (environ == NULL || environ[0] == NULL)
+
+	if ((dict = (t_dictionary *)malloc(sizeof(t_dictionary))))
+	{
+		equal_sign_pos = 0;
+		while (str[equal_sign_pos] != '=')
+			equal_sign_pos++;
+		len = ft_strlen(str);
+		dict->key = ft_strsub(str, 0, equal_sign_pos);
+		dict->value = ft_strsub(str, equal_sign_pos + 1, len);
+		dict->next = NULL;
+		return (dict);
+	}
+	else
 		return (NULL);
+}
 
-	list_new(get_key(environ[0]), get_value(environ[1]));
+void			append(t_dictionary *main, t_dictionary *new)
+{
+	while (main->next)
+		main = main->next;
+	main->next = new;
+}
+
+t_dictionary	*parse_environ(void)
+{
+	t_dictionary *environment;
+	int i;
 	
+	i = 0;
+	if (environ == NULL || environ[i] == NULL)
+		return (NULL);
+	environment = string_to_dictionary(environ[i]);
+	i++;
 	while (environ[i])
 	{
-
+		append(environment, string_to_dictionary(environ[i]));
+		i++;
 	}
+	return (environment);
 }
+
 
 
 int main (int argc, char *argv[])
 {
 	(void)argc;
 	(void)argv;
-	int	i;
-	t_dictionary *env; 
+	t_dictionary *environment; 
 
-	env = parse_environ();
-	i = 0;
-
+	environment = parse_environ();
 	
-
-	// Load config files, if any.
-	minishell_loop();
+	minishell_loop(environment);
 	// Perform any shutdown/cleanup.
 
-	return 1;
+	return (1);
 }
