@@ -3,10 +3,16 @@ NAME			 = minishell
 CC 				 = gcc
 CCFLAGS			 = -Wall -Werror -Wextra -g -O0
 
-SRC_FILES		 =	main.c			\
-					readline.c		\
-					builtins.c		\
-					dictionary.c	
+SRC_FILES		 =	builtins.c		\
+					dictionary.c	\
+					environment.c	\
+					errors.c		\
+					main.c			\
+					minishell.c		\
+					path.c			\
+					readline.c
+					
+					
 
 OBJ_FILES		 = $(SRC_FILES:.c=.o)
 
