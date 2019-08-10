@@ -1,61 +1,109 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtins.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dvoroshy <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/08/10 13:21:16 by dvoroshy          #+#    #+#             */
+/*   Updated: 2019/08/10 13:21:18 by dvoroshy         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-static char	*get_home_folder(t_dictionary *environment)
-{
-	while (environment)
-	{
-		if (ft_strcmp(environment->key, "HOME") == 0) // case?
-			return (environment->value);
-		environment = environment->next;
-	}
-	return (NULL);
-}
-
-static int	is_directory(char *path)
-{
-   struct stat meta;
-   if (stat(path, &meta) != 0)
-       return 0;
-   return S_ISDIR(meta.st_mode);
-}
-
-void	ms_exit(char **args, t_dictionary *environment)
+void	ms_exit(char **args, t_dictionary **environment)
 {
 	(void)args;
 	(void)environment;
-
 	exit(EXIT_SUCCESS);
 }
 
+void	ms_unsetenv(char **args, t_dictionary **environment)
+{
+	char			*name;
+	t_dictionary	*head;
+	t_dictionary	*prev;
 
+	name = args[1];
+	if (name == NULL)
+	{
+		print_error("unsetenv", NULL, "Too few arguments");
+		return ;
+	}
+	if (environment == NULL)
+		return ;
+	prev = NULL;
+	head = *environment;
+	while (head)
+	{
+		if (ft_strcmp(head->key, name) == 0)
+		{
+			if (!prev)
+				*environment = head->next;
+			else
+				prev->next = head->next;
+			return ;
+		}
+		prev = head;
+		head = head->next;
+	}
+}
 
-void	ms_cd(char **args, t_dictionary *environment)
+void	ms_setenv(char **args, t_dictionary **environment)
+{
+	char			*key;
+	char			*value;
+
+	key = args[1];
+	value = args[2];
+	if (key == NULL)
+	{
+		ms_env(args, environment);
+		return ;
+	}
+	ms_setenv_internal(key, value, environment);
+}
+
+void	ms_cd(char **args, t_dictionary **environment)
 {
 	char *dir;
+	char *old_pwd;
 
 	dir = args[1];
-  	if (dir == NULL || ft_strcmp(dir, "~") == 0)
-		dir = get_home_folder(environment);
+	if (dir == NULL || ft_strcmp(dir, "~") == 0)
+		dir = get_home_folder(*environment);
 	if (access(dir, F_OK) == -1)
 		print_error("cd", dir, "No such file or directory");
 	else if (access(dir, X_OK) == -1)
 		print_error("cd", dir, "Permission denied");
 	else if (!is_directory(dir))
 		print_error("cd", dir, "Not a directory");
-	else if (chdir(dir) != 0)
+	else if (chdir(dir) == 0)
 	{
-		// set PWD
+		ms_setenv_internal("PWD", dir, environment);
+		old_pwd = ms_getenv("PWD", *environment);
+		ms_setenv_internal("OLDPWD", old_pwd, environment);
+		ms_setenv(args, environment);
 	}
 	else
 		print_error("cd", dir, "Something went wrong");
 }
 
-void	ms_env(char **args, t_dictionary *environment)
+void	ms_env(char **args, t_dictionary **environment)
 {
+	t_dictionary *env;
+
 	(void)args;
-	while (environment)
+	if (!environment)
+		return ;
+	env = *environment;
+	while (env)
 	{
-		ft_printf("%s=%s\n", environment->key, environment->value);
-		environment = environment->next;
+		if (env->value)
+			ft_printf("%s=%s\n", env->key, env->value);
+		else
+			ft_printf("%s=\n", env->key);
+		env = env->next;
 	}
 }

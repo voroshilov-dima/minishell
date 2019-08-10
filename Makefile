@@ -3,13 +3,14 @@ NAME			 = minishell
 CC 				 = gcc
 CCFLAGS			 = -Wall -Werror -Wextra -g -O0
 
-SRC_FILES		 =	builtins.c		\
-					dictionary.c	\
-					environment.c	\
-					errors.c		\
-					main.c			\
-					minishell.c		\
-					path.c			\
+SRC_FILES		 =	builtins_support.c	\
+					builtins.c			\
+					dictionary.c		\
+					environment.c		\
+					errors.c			\
+					main.c				\
+					minishell.c			\
+					path.c				\
 					readline.c
 					
 					
