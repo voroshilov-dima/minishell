@@ -46,24 +46,42 @@ static char	*get_full_path(char *dir, char *file)
 	return (file_path);
 }
 
+char		*find_file_in_directory(char *dir_name, char *file_name)
+{
+	DIR				*dir;
+	struct dirent	*dirent;
+	char			*full_path;
+
+	full_path = NULL;
+	dir = opendir(dir_name);
+	while ((dirent = readdir(dir)) != NULL)
+	{
+		if (ft_strcmp(dirent->d_name, file_name) == 0)
+		{
+			full_path = get_full_path(dir_name, dirent->d_name);
+			break ;
+		}
+	}
+	closedir(dir);
+	return (full_path);
+}
+
 char		*find_program_path(char *name, t_dictionary *env)
 {
-	char			**path;
-	struct dirent	*dirent;
-	DIR				*dir;
-	int				i;
+	char	**path;
+	char	*full_path;
+	int		i;
 
 	i = 0;
+	full_path = NULL;
 	path = get_path(env);
 	while (path[i])
 	{
-		dir = opendir(path[i]);
-		while ((dirent = readdir(dir)) != NULL)
-		{
-			if (ft_strcmp(dirent->d_name, name) == 0)
-				return (get_full_path(path[i], dirent->d_name));
-		}
+		full_path = find_file_in_directory(path[i], name);
+		if (full_path)
+			break ;
 		i++;
 	}
-	return (NULL);
+	clean_table(path);
+	return (full_path);
 }

@@ -38,6 +38,7 @@ void			minishell_loop(t_dictionary **environment);
 
 char			*readline(void);
 t_dictionary	*parse_environ(void);
+char			**list_to_array(t_dictionary *environment);
 char			*find_program_path(char *name, t_dictionary *env);
 
 void			ms_cd(char **args, t_dictionary **environment);
@@ -55,6 +56,8 @@ int				is_directory(char *path);
 t_dictionary	*string_to_dictionary(char *str);
 t_dictionary	*dictionary_create(char *key, char *value);
 void			dictionary_append(t_dictionary *main, t_dictionary *new);
+
+void			clean_table(char **table);
 
 void			throw_error(char *command, char *error_message);
 void			print_error(char *command, char *arg, char *error_message);

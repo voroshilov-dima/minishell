@@ -29,3 +29,58 @@ t_dictionary	*parse_environ(void)
 	}
 	return (environment);
 }
+
+static char		*concat(char *key, char *value)
+{
+	char	*str;
+	int		key_len;
+	int		value_len;
+	int		i;
+
+	key_len = ft_strlen(key);
+	value_len = ft_strlen(value);
+	str = (char *)malloc(sizeof(char) * (key_len + value_len + 2));
+	i = 0;
+	while (i < key_len)
+	{
+		str[i] = key[i];
+		i++; 
+	}
+	str[i] = '=';
+	i = 0;
+	while (i < value_len)
+	{
+		str[key_len + 1 + i] = value[i];
+		i++;
+	}
+	str[key_len + value_len + 1] = 0;
+	return (str);
+}
+
+char			**list_to_array(t_dictionary *environment)
+{
+	t_dictionary	*pointer;
+	char			**env;
+	int				len;
+	int				i;
+
+	if (!environment)
+		return (NULL);
+	len = 0;
+	pointer = environment;
+	while (pointer)
+	{
+		len++;
+		pointer = pointer->next;
+	}
+	env = (char **)malloc(sizeof(char *) * (len + 1));
+	i = 0;
+	while (environment)
+	{
+		env[i] = concat(environment->key, environment->value);
+		environment = environment->next;
+		i++;
+	}
+	env[len] = 0;
+	return (env);
+}

@@ -22,13 +22,30 @@ static t_builtin	g_builtins[] = {
 };
 
 
+static void			handle_sigint(int sig) 
+{
+	(void)sig;
+	ft_printf("\n");
+}
 
-void				launch(char **args, t_dictionary *environment)
+void				print_table(char **env)
+{
+	int i;
+
+	i = 0;
+	while (env[i])
+	{
+		printf("%s\n", env[i]);
+		i++;
+	}
+}
+
+void				launch(char **args, t_dictionary *env)
 {
 	pid_t	pid;
-	pid_t	wpid;
 	int		status;
 	char	*program;
+	char	**env_array;
 
 	(void)args;
 	pid = fork();
@@ -36,18 +53,22 @@ void				launch(char **args, t_dictionary *environment)
 		throw_error("fork", "forking failed");
 	if (pid == 0)
 	{
-		program = find_program_path(args[0], environment);
+		program = find_program_path(args[0], env);
 		if (!program)
 			throw_error(args[0], "command not found");
-		execve(program, args, NULL);
+		env_array = list_to_array(env);
+		print_table(env_array);
+		execve(program, args, env_array);
+		free(program);
+		clean_table(env_array);
 		throw_error(args[0], "Permission denied");
 	}
 	else
 	{
-		wpid = waitpid(pid, &status, WUNTRACED);
-		ft_printf("Done\n");
-		// } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+		signal(SIGINT, handle_sigint);
+		waitpid(pid, &status, WUNTRACED);
 	}
+	 	
 }
 
 void				execute(char **args, t_dictionary **environment)
@@ -76,13 +97,16 @@ void				minishell_loop(t_dictionary **environment)
 	char	*line;
 	char	**args;
 
-	
 	while (TRUE)
-	{
-		
+	{		
 		ft_printf("$> ");
 		line = readline();
-		args = ft_strsplit(line, ' ');
-		execute(args, environment);
+		if (line)
+		{
+			args = ft_strsplit(line, ' ');
+			free(line);
+			execute(args, environment);
+			clean_table(args);
+		}
 	}
 }

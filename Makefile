@@ -9,6 +9,7 @@ SRC_FILES		 =	builtins_support.c	\
 					environment.c		\
 					errors.c			\
 					main.c				\
+					memory.c			\
 					minishell.c			\
 					path.c				\
 					readline.c

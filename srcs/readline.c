@@ -12,40 +12,54 @@
 
 #include "minishell.h"
 
-int			g_keep_reading = TRUE;
+static int			position;
+static int			buff_size;
 
-void				handle_sigint(int sig) 
+static void			handle_sigint(int sig) 
 {
 	(void)sig;
-	ft_printf("I'm here\n");
-	g_keep_reading = FALSE;
-	//exit(EXIT_SUCCESS);
+	position = 0;
+	ft_printf("\n$> ");
+}
 
-} 
+static void			quit_minishell(void)
+{
+	ft_printf("\n");
+	exit(EXIT_SUCCESS);
+}
+
+static char			*move_position(char *buffer)
+{
+	char *new_buffer;
+
+	position++;
+	if (position >= buff_size)
+	{
+		new_buffer = malloc(sizeof(char) * (buff_size + BUFSIZE));
+		ft_memcpy(new_buffer, buffer, buff_size);
+		buff_size += BUFSIZE;
+		free(buffer);
+		return (new_buffer);
+	}
+	else
+		return (buffer);
+}
 
 char	*readline(void)
 {
-	int		bufsize;
-	int		position;
 	char	*buffer;
 	char	c;
-	int		readed;
 
-	bufsize = BUFSIZE;
 	position = 0;
-	buffer = malloc(sizeof(char) * bufsize);
+	buff_size = BUFSIZE;
+	buffer = malloc(sizeof(char) * buff_size);
 	signal(SIGINT, handle_sigint);
 	while (TRUE)
 	{
-		readed = read(0, &c, 1);
-		if (!readed)
+		if (!read(0, &c, 1))
 		{
 	 		if (position == 0)
-			{
-				ft_printf("\n");
-				exit(EXIT_SUCCESS);
-			}
-				
+				quit_minishell();
 			continue;
 		}
 		if (c == '\n' || c == EOF)
@@ -55,13 +69,7 @@ char	*readline(void)
 		}
 		else
 			buffer[position] = c;
-		position++;
-		if (position >= bufsize)
-		{
-			bufsize += BUFSIZE;
-			buffer = realloc(buffer, bufsize);
-		}
+		buffer = move_position(buffer);
 	}
-	ft_printf("OUT\n");
 	return (NULL);
 }
