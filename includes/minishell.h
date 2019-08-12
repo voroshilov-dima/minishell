@@ -34,6 +34,8 @@ typedef struct	s_builtin
 	void (*func)(char **, t_dictionary **);
 }				t_builtin;
 
+char			*g_home;
+
 void			minishell_loop(t_dictionary **environment);
 
 char			*readline(void);
@@ -57,7 +59,10 @@ t_dictionary	*string_to_dictionary(char *str);
 t_dictionary	*dictionary_create(char *key, char *value);
 void			dictionary_append(t_dictionary *main, t_dictionary *new);
 
-void			clean_table(char **table);
+void			handle_symbols(char **args, t_dictionary *env);
+
+void			free_table(char **table);
+void			free_dictionary(t_dictionary *dict);
 
 void			throw_error(char *command, char *error_message);
 void			print_error(char *command, char *arg, char *error_message);

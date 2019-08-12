@@ -25,6 +25,7 @@ static void			handle_sigint(int sig)
 static void			quit_minishell(void)
 {
 	ft_printf("\n");
+	free(g_home);
 	exit(EXIT_SUCCESS);
 }
 

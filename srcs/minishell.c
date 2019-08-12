@@ -53,20 +53,22 @@ void				launch(char **args, t_dictionary *env)
 		throw_error("fork", "forking failed");
 	if (pid == 0)
 	{
+		ft_printf("I'm here\n");
 		program = find_program_path(args[0], env);
 		if (!program)
 			throw_error(args[0], "command not found");
+		ft_printf("I'm here\n");
 		env_array = list_to_array(env);
-		print_table(env_array);
 		execve(program, args, env_array);
 		free(program);
-		clean_table(env_array);
+		free_table(env_array);
 		throw_error(args[0], "Permission denied");
 	}
 	else
 	{
 		signal(SIGINT, handle_sigint);
 		waitpid(pid, &status, WUNTRACED);
+		printf("Done");
 	}
 	 	
 }
@@ -105,8 +107,9 @@ void				minishell_loop(t_dictionary **environment)
 		{
 			args = ft_strsplit(line, ' ');
 			free(line);
+			handle_symbols(args, *environment);
 			execute(args, environment);
-			clean_table(args);
+			free_table(args);
 		}
 	}
 }

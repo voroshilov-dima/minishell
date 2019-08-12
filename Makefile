@@ -12,7 +12,8 @@ SRC_FILES		 =	builtins_support.c	\
 					memory.c			\
 					minishell.c			\
 					path.c				\
-					readline.c
+					readline.c			\
+					symbols.c
 					
 					
 

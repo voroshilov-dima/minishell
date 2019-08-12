@@ -20,7 +20,7 @@ char	*get_home_folder(t_dictionary *environment)
 			return (environment->value);
 		environment = environment->next;
 	}
-	return (NULL);
+	return (g_home);
 }
 
 int		is_directory(char *path)
@@ -41,7 +41,8 @@ void	ms_setenv_internal(char *key, char *value, t_dictionary **environment)
 	{
 		if (ft_strcmp(env->key, key) == 0)
 		{
-			env->value = value;
+			free(env->value);
+			env->value = ft_strdup(value);
 			return ;
 		}
 		else if (env->next == NULL)

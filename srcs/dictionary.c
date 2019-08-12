@@ -17,8 +17,8 @@ t_dictionary	*dictionary_create(char *key, char *value)
 	t_dictionary	*dict;
 
 	dict = (t_dictionary *)malloc(sizeof(t_dictionary));
-	dict->key = key;
-	dict->value = value;
+	dict->key = ft_strdup(key);
+	dict->value = ft_strdup(value);
 	dict->next = NULL;
 	return (dict);
 }
@@ -37,7 +37,11 @@ t_dictionary	*string_to_dictionary(char *str)
 		equal_sign_pos++;
 	key = ft_strsub(str, 0, equal_sign_pos);
 	value = ft_strsub(str, equal_sign_pos + 1, len);
+	if (ft_strcmp(key, "HOME") == 0)
+		g_home = ft_strdup(value);
 	dict = dictionary_create(key, value);
+	free(key);
+	free(value);
 	return (dict);
 }
 

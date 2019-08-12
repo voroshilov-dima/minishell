@@ -43,6 +43,7 @@ void	ms_unsetenv(char **args, t_dictionary **environment)
 				*environment = head->next;
 			else
 				prev->next = head->next;
+			free_dictionary(head);
 			return ;
 		}
 		prev = head;
@@ -74,17 +75,16 @@ void	ms_cd(char **args, t_dictionary **environment)
 	if (dir == NULL || ft_strcmp(dir, "~") == 0)
 		dir = get_home_folder(*environment);
 	if (access(dir, F_OK) == -1)
-		print_error("cd", dir, "No such file or directory");
-	else if (access(dir, X_OK) == -1)
-		print_error("cd", dir, "Permission denied");
+		print_error("cd", "No such file or directory", dir);
 	else if (!is_directory(dir))
-		print_error("cd", dir, "Not a directory");
+		print_error("cd", "Not a directory", dir);
+	else if (access(dir, X_OK) == -1)
+		print_error("cd", "Permission denied", dir);
 	else if (chdir(dir) == 0)
 	{
 		ms_setenv_internal("PWD", dir, environment);
 		old_pwd = ms_getenv("PWD", *environment);
 		ms_setenv_internal("OLDPWD", old_pwd, environment);
-		ms_setenv(args, environment);
 	}
 	else
 		print_error("cd", dir, "Something went wrong");
