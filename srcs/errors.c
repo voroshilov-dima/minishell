@@ -14,14 +14,14 @@
 
 void	throw_error(char *command, char *error_message)
 {
-	ft_printf("minishell: %s: %s\n", command, error_message);
-	//exit(EXIT_FAILURE);
+	ft_printf("%s: %s\n", command, error_message);
+	exit(EXIT_FAILURE);
 }
 
-void	print_error(char *command, char *arg, char *error_message)
+void	print_error(char *command, char *error_message, char *arg)
 {
 	if (arg)
-		ft_printf("%s: %s: %s\n", command, arg, error_message);
+		ft_printf("%s: %s: %s\n", command, error_message, arg);
 	else
 		ft_printf("%s: %s\n", command, error_message);
 }

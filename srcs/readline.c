@@ -12,13 +12,13 @@
 
 #include "minishell.h"
 
-static int			position;
-static int			buff_size;
+static int			g_position;
+static int			g_buff_size;
 
 static void			handle_sigint(int sig) 
 {
 	(void)sig;
-	position = 0;
+	g_position = 0;
 	ft_printf("\n$> ");
 }
 
@@ -33,12 +33,12 @@ static char			*move_position(char *buffer)
 {
 	char *new_buffer;
 
-	position++;
-	if (position >= buff_size)
+	g_position++;
+	if (g_position >= g_buff_size)
 	{
-		new_buffer = malloc(sizeof(char) * (buff_size + BUFSIZE));
-		ft_memcpy(new_buffer, buffer, buff_size);
-		buff_size += BUFSIZE;
+		new_buffer = malloc(sizeof(char) * (g_buff_size + BUFSIZE));
+		ft_memcpy(new_buffer, buffer, g_buff_size);
+		g_buff_size += BUFSIZE;
 		free(buffer);
 		return (new_buffer);
 	}
@@ -51,25 +51,25 @@ char	*readline(void)
 	char	*buffer;
 	char	c;
 
-	position = 0;
-	buff_size = BUFSIZE;
-	buffer = malloc(sizeof(char) * buff_size);
+	g_position = 0;
+	g_buff_size = BUFSIZE;
+	buffer = malloc(sizeof(char) * g_buff_size);
 	signal(SIGINT, handle_sigint);
 	while (TRUE)
 	{
 		if (!read(0, &c, 1))
 		{
-	 		if (position == 0)
+	 		if (g_position == 0)
 				quit_minishell();
 			continue;
 		}
 		if (c == '\n' || c == EOF)
 		{
-			buffer[position] = '\0';
+			buffer[g_position] = '\0';
 			return (buffer);
 		}
 		else
-			buffer[position] = c;
+			buffer[g_position] = c;
 		buffer = move_position(buffer);
 	}
 	return (NULL);

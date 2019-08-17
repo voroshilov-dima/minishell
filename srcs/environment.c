@@ -38,7 +38,7 @@ static char		*concat(char *key, char *value)
 	int		i;
 
 	key_len = ft_strlen(key);
-	value_len = ft_strlen(value);
+	value_len = (value ? ft_strlen(value) : 0);
 	str = (char *)malloc(sizeof(char) * (key_len + value_len + 2));
 	i = 0;
 	while (i < key_len)

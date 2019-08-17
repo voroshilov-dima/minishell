@@ -17,6 +17,8 @@ static t_builtin	g_builtins[] = {
 	{"env", ms_env},
 	{"setenv", ms_setenv},
 	{"unsetenv", ms_unsetenv},
+	{"echo", ms_echo},
+	{"pwd", ms_pwd},
 	{"exit", ms_exit},
 	{"null", NULL}
 };
@@ -53,13 +55,12 @@ void				launch(char **args, t_dictionary *env)
 		throw_error("fork", "forking failed");
 	if (pid == 0)
 	{
-		ft_printf("I'm here\n");
 		program = find_program_path(args[0], env);
+		
 		if (!program)
 			throw_error(args[0], "command not found");
-		ft_printf("I'm here\n");
 		env_array = list_to_array(env);
-		execve(program, args, env_array);
+		execve(program, args, NULL);
 		free(program);
 		free_table(env_array);
 		throw_error(args[0], "Permission denied");
@@ -68,7 +69,6 @@ void				launch(char **args, t_dictionary *env)
 	{
 		signal(SIGINT, handle_sigint);
 		waitpid(pid, &status, WUNTRACED);
-		printf("Done");
 	}
 	 	
 }

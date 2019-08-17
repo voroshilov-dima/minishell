@@ -22,7 +22,9 @@ static char *handle_tilde(char *str, t_dictionary *env)
 	new_str = NULL;
 	if (str[0] != '~' || (str[1] != 0 && str[1] != '/'))
 		return (str);
-	home_dir = get_home_folder(env);
+	home_dir = ms_getenv("HOME", env);
+	if (!home_dir)
+		return (NULL);
 	if (str[1] == 0)
 		new_str = ft_strdup(home_dir);
 	else
@@ -36,6 +38,20 @@ static char *handle_tilde(char *str, t_dictionary *env)
 	return (new_str);
 }
 
+static char *handle_dollar(char *str, t_dictionary *env)
+{
+	while (env)
+	{
+		if (ft_strcmp(env->key, str + 1) == 0)
+		{
+			free (str);
+			return (ft_strdup(env->value));
+		}
+		env = env->next;
+	}
+	return (NULL);
+}
+
 void	handle_symbols(char **args, t_dictionary *env)
 {
 	int	i;
@@ -44,7 +60,8 @@ void	handle_symbols(char **args, t_dictionary *env)
 	while (args[i])
 	{
 		args[i] = handle_tilde(args[i], env);
-		// args[i] = handle_dollar(args[i]);
+		if (args[i] && args[i][0] == '$' && args[i][1])
+			args[i] = handle_dollar(args[i], env);
 		i++;
 	}
 }

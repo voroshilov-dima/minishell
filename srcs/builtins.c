@@ -51,6 +51,22 @@ void	ms_unsetenv(char **args, t_dictionary **environment)
 	}
 }
 
+void	ms_echo(char **args, t_dictionary **environment)
+{
+	int	i;
+
+	i = 1;
+	(void)environment;
+	while (args[i])
+	{
+		ft_printf("%s", args[i]);
+		if (args[i + 1])
+			ft_printf(" ");
+		i++;
+	}
+	ft_printf("\n");
+}
+
 void	ms_setenv(char **args, t_dictionary **environment)
 {
 	char			*key;
@@ -69,25 +85,42 @@ void	ms_setenv(char **args, t_dictionary **environment)
 void	ms_cd(char **args, t_dictionary **environment)
 {
 	char *dir;
-	char *old_pwd;
 
 	dir = args[1];
-	if (dir == NULL || ft_strcmp(dir, "~") == 0)
-		dir = get_home_folder(*environment);
-	if (access(dir, F_OK) == -1)
+	if (dir == NULL)
+		dir = ms_getenv("HOME", *environment);
+	if (dir && ft_strcmp(dir, "-") == 0)
+		dir = ms_getenv("OLDPWD", *environment);
+	if (dir == NULL)
+		print_error("cd", "HOME not set", NULL);
+	else if (access(dir, F_OK) == -1)
 		print_error("cd", "No such file or directory", dir);
 	else if (!is_directory(dir))
 		print_error("cd", "Not a directory", dir);
 	else if (access(dir, X_OK) == -1)
 		print_error("cd", "Permission denied", dir);
 	else if (chdir(dir) == 0)
-	{
-		ms_setenv_internal("PWD", dir, environment);
-		old_pwd = ms_getenv("PWD", *environment);
-		ms_setenv_internal("OLDPWD", old_pwd, environment);
-	}
+		update_dir_variables(dir, environment);
 	else
 		print_error("cd", dir, "Something went wrong");
+}
+
+void	ms_pwd(char **args, t_dictionary **environment)
+{
+	t_dictionary *env;
+
+	(void)args;
+	env = *environment;
+	while (env)
+	{
+		if (ft_strcmp(env->key, "PWD") == 0)
+		{
+			ft_printf("%s\n", env->value);
+			return ;
+		}
+		env = env->next;
+	}
+	ft_printf("PWD not set\n");
 }
 
 void	ms_env(char **args, t_dictionary **environment)

@@ -18,7 +18,10 @@ t_dictionary	*dictionary_create(char *key, char *value)
 
 	dict = (t_dictionary *)malloc(sizeof(t_dictionary));
 	dict->key = ft_strdup(key);
-	dict->value = ft_strdup(value);
+	if (value)
+		dict->value = ft_strdup(value);
+	else
+		dict->value = NULL;
 	dict->next = NULL;
 	return (dict);
 }

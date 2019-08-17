@@ -47,13 +47,15 @@ void			ms_cd(char **args, t_dictionary **environment);
 void			ms_env(char **args, t_dictionary **environment);
 void			ms_setenv(char **args, t_dictionary **environment);
 void			ms_unsetenv(char **args, t_dictionary **environment);
+void			ms_echo(char **args, t_dictionary **environment);
+void			ms_pwd(char **args, t_dictionary **environment);
 void			ms_exit(char **args, t_dictionary **environment);
 
 void			ms_setenv_internal(char *key, char *value,
 					t_dictionary **environment);
-char			*get_home_folder(t_dictionary *environment);
 char			*ms_getenv(char *name, t_dictionary *env);
 int				is_directory(char *path);
+void			update_dir_variables(char *dir, t_dictionary **environment);
 
 t_dictionary	*string_to_dictionary(char *str);
 t_dictionary	*dictionary_create(char *key, char *value);

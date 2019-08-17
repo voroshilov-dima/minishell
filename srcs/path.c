@@ -75,7 +75,6 @@ char		*find_program_path(char *name, t_dictionary *env)
 	i = 0;
 	full_path = NULL;
 	path = get_path(env);
-	printf("Searching start\n");
 	while (path[i])
 	{
 		full_path = find_file_in_directory(path[i], name);
@@ -83,9 +82,6 @@ char		*find_program_path(char *name, t_dictionary *env)
 			break ;
 		i++;
 	}
-	printf("Searching stop\n");
-
 	free_table(path);
-
 	return (full_path);
 }

@@ -12,17 +12,6 @@
 
 #include "minishell.h"
 
-char	*get_home_folder(t_dictionary *environment)
-{
-	while (environment)
-	{
-		if (ft_strcmp(environment->key, "HOME") == 0)
-			return (environment->value);
-		environment = environment->next;
-	}
-	return (g_home);
-}
-
 int		is_directory(char *path)
 {
 	struct stat	meta;
@@ -30,6 +19,79 @@ int		is_directory(char *path)
 	if (stat(path, &meta) != 0)
 		return (0);
 	return (S_ISDIR(meta.st_mode));
+}
+
+char	*get_parent_dir(t_dictionary *env)
+{
+	int		i;
+	int		pos;
+	char	*pwd;
+	char	*parent;
+
+	i = 0;
+	pos = -1;
+	pwd = ms_getenv("PWD", env);
+	if (!pwd)
+		return (NULL);
+	if (ft_strcmp(pwd, "/") == 0)
+		return (ft_strdup("/"));
+	while (pwd[i])
+	{
+		if (pwd[i] == '/')
+			pos = i;
+		i++;
+	}
+	if (pos == 0)
+		return (ft_strdup("/"));
+	parent = ft_strsub(pwd, 0, pos);
+	return (parent);
+}
+
+char	*ms_join_paths(t_dictionary *env, char *dir)
+{
+	char *pwd;
+	char *temp;
+	char *final;
+
+	pwd = ms_getenv("PWD", env);
+	if (!pwd)
+		return (NULL);
+	if (ft_strcmp(pwd, "/") == 0)
+		final = ft_strjoin(pwd, dir);	
+	else
+	{
+		temp = ft_strjoin(pwd, "/");
+		final = ft_strjoin(temp, dir);
+		free(temp);
+	}
+	return (final);
+}
+
+void	update_dir_variables(char *dir, t_dictionary **environment)
+{
+	char *old_pwd;
+	char *pwd;
+
+	old_pwd = ms_getenv("PWD", *environment);
+	if (old_pwd)
+		ms_setenv_internal("OLDPWD", old_pwd, environment);
+	if (ft_strcmp(dir, ".") == 0)
+		ms_setenv_internal("PWD", old_pwd, environment);
+	else if (ft_strcmp(dir, "..") == 0)
+	{
+		pwd = get_parent_dir(*environment);
+		ms_setenv_internal("PWD", pwd, environment);
+		free(pwd);
+	}
+	else if (dir[0] == '/')
+		ms_setenv_internal("PWD", dir, environment);
+	else
+	{
+		pwd = ms_join_paths(*environment, dir);
+		ms_setenv_internal("PWD", pwd, environment);
+		if (pwd)
+			free(pwd);
+	}
 }
 
 void	ms_setenv_internal(char *key, char *value, t_dictionary **environment)
@@ -42,7 +104,8 @@ void	ms_setenv_internal(char *key, char *value, t_dictionary **environment)
 		if (ft_strcmp(env->key, key) == 0)
 		{
 			free(env->value);
-			env->value = ft_strdup(value);
+			if (value)
+				env->value = ft_strdup(value);
 			return ;
 		}
 		else if (env->next == NULL)
