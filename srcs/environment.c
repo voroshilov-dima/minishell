@@ -44,7 +44,7 @@ static char		*concat(char *key, char *value)
 	while (i < key_len)
 	{
 		str[i] = key[i];
-		i++; 
+		i++;
 	}
 	str[i] = '=';
 	i = 0;

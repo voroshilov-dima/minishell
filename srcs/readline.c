@@ -12,24 +12,24 @@
 
 #include "minishell.h"
 
-static int			g_position;
-static int			g_buff_size;
+static int	g_position;
+static int	g_buff_size;
 
-static void			handle_sigint(int sig) 
+static void	handle_sigint(int sig)
 {
 	(void)sig;
 	g_position = 0;
 	ft_printf("\n$> ");
 }
 
-static void			quit_minishell(void)
+static void	quit_minishell(void)
 {
 	ft_printf("\n");
 	free(g_home);
 	exit(EXIT_SUCCESS);
 }
 
-static char			*move_position(char *buffer)
+static char	*move_position(char *buffer)
 {
 	char *new_buffer;
 
@@ -46,7 +46,7 @@ static char			*move_position(char *buffer)
 		return (buffer);
 }
 
-char	*readline(void)
+char		*readline(void)
 {
 	char	*buffer;
 	char	c;
@@ -59,7 +59,7 @@ char	*readline(void)
 	{
 		if (!read(0, &c, 1))
 		{
-	 		if (g_position == 0)
+			if (g_position == 0)
 				quit_minishell();
 			continue;
 		}

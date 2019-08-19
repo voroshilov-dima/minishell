@@ -3,8 +3,9 @@ NAME			 = minishell
 CC 				 = gcc
 CCFLAGS			 = -Wall -Werror -Wextra -g -O0
 
-SRC_FILES		 =	builtins_support.c	\
-					builtins.c			\
+SRC_FILES		 =	builtins_1.c		\
+					builtins_2.c		\
+					builtins_support.c	\
 					dictionary.c		\
 					environment.c		\
 					errors.c			\

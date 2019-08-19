@@ -55,6 +55,7 @@ void			ms_setenv_internal(char *key, char *value,
 					t_dictionary **environment);
 char			*ms_getenv(char *name, t_dictionary *env);
 int				is_directory(char *path);
+char			*ms_join_paths(t_dictionary *env, char *dir);
 void			update_dir_variables(char *dir, t_dictionary **environment);
 
 t_dictionary	*string_to_dictionary(char *str);

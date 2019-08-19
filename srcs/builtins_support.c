@@ -47,26 +47,6 @@ char	*get_parent_dir(t_dictionary *env)
 	return (parent);
 }
 
-char	*ms_join_paths(t_dictionary *env, char *dir)
-{
-	char *pwd;
-	char *temp;
-	char *final;
-
-	pwd = ms_getenv("PWD", env);
-	if (!pwd)
-		return (NULL);
-	if (ft_strcmp(pwd, "/") == 0)
-		final = ft_strjoin(pwd, dir);	
-	else
-	{
-		temp = ft_strjoin(pwd, "/");
-		final = ft_strjoin(temp, dir);
-		free(temp);
-	}
-	return (final);
-}
-
 void	update_dir_variables(char *dir, t_dictionary **environment)
 {
 	char *old_pwd;

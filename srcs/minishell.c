@@ -23,8 +23,7 @@ static t_builtin	g_builtins[] = {
 	{"null", NULL}
 };
 
-
-static void			handle_sigint(int sig) 
+static void			handle_sigint(int sig)
 {
 	(void)sig;
 	ft_printf("\n");
@@ -56,7 +55,6 @@ void				launch(char **args, t_dictionary *env)
 	if (pid == 0)
 	{
 		program = find_program_path(args[0], env);
-		
 		if (!program)
 			throw_error(args[0], "command not found");
 		env_array = list_to_array(env);
@@ -70,7 +68,6 @@ void				launch(char **args, t_dictionary *env)
 		signal(SIGINT, handle_sigint);
 		waitpid(pid, &status, WUNTRACED);
 	}
-	 	
 }
 
 void				execute(char **args, t_dictionary **environment)
@@ -92,15 +89,13 @@ void				execute(char **args, t_dictionary **environment)
 	launch(args, *environment);
 }
 
-
-
 void				minishell_loop(t_dictionary **environment)
 {
 	char	*line;
 	char	**args;
 
 	while (TRUE)
-	{		
+	{
 		ft_printf("$> ");
 		line = readline();
 		if (line)

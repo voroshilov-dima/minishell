@@ -54,6 +54,8 @@ char		*find_file_in_directory(char *dir_name, char *file_name)
 
 	full_path = NULL;
 	dir = opendir(dir_name);
+	if (!dir)
+		return (NULL);
 	while ((dirent = readdir(dir)) != NULL)
 	{
 		if (ft_strcmp(dirent->d_name, file_name) == 0)
@@ -75,6 +77,8 @@ char		*find_program_path(char *name, t_dictionary *env)
 	i = 0;
 	full_path = NULL;
 	path = get_path(env);
+	if (!path)
+		return (NULL);
 	while (path[i])
 	{
 		full_path = find_file_in_directory(path[i], name);
@@ -84,4 +88,24 @@ char		*find_program_path(char *name, t_dictionary *env)
 	}
 	free_table(path);
 	return (full_path);
+}
+
+char		*ms_join_paths(t_dictionary *env, char *dir)
+{
+	char *pwd;
+	char *temp;
+	char *final;
+
+	pwd = ms_getenv("PWD", env);
+	if (!pwd)
+		return (NULL);
+	if (ft_strcmp(pwd, "/") == 0)
+		final = ft_strjoin(pwd, dir);
+	else
+	{
+		temp = ft_strjoin(pwd, "/");
+		final = ft_strjoin(temp, dir);
+		free(temp);
+	}
+	return (final);
 }

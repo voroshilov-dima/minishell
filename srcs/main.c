@@ -18,8 +18,7 @@ int	main(int argc, char *argv[])
 
 	(void)argc;
 	(void)argv;
-	
 	environment = parse_environ();
 	minishell_loop(&environment);
-	return (1);
+	return (0);
 }

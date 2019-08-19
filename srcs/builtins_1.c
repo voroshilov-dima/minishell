@@ -21,23 +21,18 @@ void	ms_exit(char **args, t_dictionary **environment)
 
 void	ms_unsetenv(char **args, t_dictionary **environment)
 {
-	char			*name;
 	t_dictionary	*head;
 	t_dictionary	*prev;
 
-	name = args[1];
-	if (name == NULL)
-	{
+	if (args[1] == NULL)
 		print_error("unsetenv", NULL, "Too few arguments");
-		return ;
-	}
-	if (environment == NULL)
+	if (args[1] == NULL || environment == NULL)
 		return ;
 	prev = NULL;
 	head = *environment;
 	while (head)
 	{
-		if (ft_strcmp(head->key, name) == 0)
+		if (ft_strcmp(head->key, args[1]) == 0)
 		{
 			if (!prev)
 				*environment = head->next;
@@ -103,40 +98,4 @@ void	ms_cd(char **args, t_dictionary **environment)
 		update_dir_variables(dir, environment);
 	else
 		print_error("cd", dir, "Something went wrong");
-}
-
-void	ms_pwd(char **args, t_dictionary **environment)
-{
-	t_dictionary *env;
-
-	(void)args;
-	env = *environment;
-	while (env)
-	{
-		if (ft_strcmp(env->key, "PWD") == 0)
-		{
-			ft_printf("%s\n", env->value);
-			return ;
-		}
-		env = env->next;
-	}
-	ft_printf("PWD not set\n");
-}
-
-void	ms_env(char **args, t_dictionary **environment)
-{
-	t_dictionary *env;
-
-	(void)args;
-	if (!environment)
-		return ;
-	env = *environment;
-	while (env)
-	{
-		if (env->value)
-			ft_printf("%s=%s\n", env->key, env->value);
-		else
-			ft_printf("%s=\n", env->key);
-		env = env->next;
-	}
 }
