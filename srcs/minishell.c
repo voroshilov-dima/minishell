@@ -36,7 +36,7 @@ void				print_table(char **env)
 	i = 0;
 	while (env[i])
 	{
-		printf("%s\n", env[i]);
+		ft_printf("%s\n", env[i]);
 		i++;
 	}
 }
